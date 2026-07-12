@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✏️ تعديل الملف - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .editor-container {
+            margin: 20px 0;
+        }
+        .editor-container textarea {
+            width: 100%;
+            min-height: 400px;
+            background: #0c0c0c;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            resize: vertical;
+            outline: none;
+            line-height: 1.6;
+        }
+        .editor-container textarea:focus {
+            border-color: #667eea;
+        }
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .editor-header h3 {
+            margin: 0;
+        }
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .btn-save {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-save:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .btn-cancel {
+            background: #666;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-cancel:hover {
+            background: #555;
+        }
+        .file-info {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        .file-info strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories" class="active">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="editor-header">
+                <h3>✏️ تعديل الملف: {{ filename }}</h3>
+                <a href="/repo/{{ repo_id }}" class="btn-cancel" style="padding:6px 20px; font-size:14px;">↩ العودة</a>
+            </div>
+
+            <div class="file-info">
+                <strong>📂 المستودع:</strong> #{{ repo_id }} | 
+                <strong>📄 الملف:</strong> {{ filename }}
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="/edit_file/{{ repo_id }}/{{ filename }}" method="POST">
+                <div class="editor-container">
+                    <textarea name="content" spellcheck="false">{{ content }}</textarea>
+                </div>
+
+                <div class="editor-actions">
+                    <button type="submit" class="btn-save">💾 حفظ التغييرات</button>
+                    <a href="/repo/{{ repo_id }}" class="btn
