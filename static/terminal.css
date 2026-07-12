@@ -1,0 +1,282 @@
+/* static/terminal.css */
+
+/* ========== شريط المحطة ========== */
+.terminal-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.terminal-header-bar h3 {
+    margin: 0;
+    color: #333;
+}
+
+.terminal-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.status-badge {
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.status-badge.running {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.stopped {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.status-badge.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ========== حاوية المحطة ========== */
+.terminal-wrapper {
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #333;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-header {
+    background: #2d2d2d;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #333;
+}
+
+.terminal-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.terminal-dot.red {
+    background: #ff5f56;
+}
+.terminal-dot.yellow {
+    background: #ffbd2e;
+}
+.terminal-dot.green {
+    background: #27c93f;
+}
+
+.terminal-title {
+    color: #aaa;
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* ========== شاشة العرض ========== */
+.terminal-display {
+    background: #0c0c0c;
+    padding: 20px;
+    min-height: 350px;
+    max-height: 450px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.terminal-display::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-display::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.terminal-display::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+.terminal-display::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+/* ========== أسطر المحطة ========== */
+.terminal-line {
+    padding: 2px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.terminal-line .prompt {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.terminal-line .command {
+    color: #ffaa00;
+}
+
+.terminal-line .output {
+    color: #cccccc;
+}
+
+.terminal-line .success {
+    color: #00ff00;
+}
+
+.terminal-line .error {
+    color: #ff4444;
+}
+
+.terminal-line .info {
+    color: #4fc3f7;
+}
+
+.terminal-line .warning {
+    color: #ffaa00;
+}
+
+.terminal-line .loading {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%,
+    50% {
+        opacity: 1;
+    }
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+/* ========== أزرار التحكم ========== */
+.terminal-controls {
+    padding: 15px 20px;
+    background: #1a1a1a;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-terminal {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+.btn-terminal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-terminal:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-terminal.start {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-terminal.start:hover {
+    background: #45a049;
+}
+
+.btn-terminal.stop {
+    background: #ff4444;
+    color: white;
+}
+
+.btn-terminal.stop:hover {
+    background: #cc0000;
+}
+
+.btn-terminal.restart {
+    background: #ffaa00;
+    color: #0c0c0c;
+}
+
+.btn-terminal.restart:hover {
+    background: #e69900;
+}
+
+.btn-terminal.back {
+    background: #555;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-terminal.back:hover {
+    background: #444;
+}
+
+/* ========== معلومات إضافية ========== */
+.terminal-info {
+    margin-top: 10px;
+    color: #888;
+    font-size: 13px;
+}
+
+/* ========== متجاوب ========== */
+@media (max-width: 768px) {
+    .terminal-header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .terminal-display {
+        min-height: 250px;
+        max-height: 350px;
+        font-size: 12px;
+        padding: 15px;
+    }
+
+    .terminal-controls {
+        padding: 12px 15px;
+        justify-content: center;
+    }
+
+    .btn-terminal {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .terminal-display {
+        min-height: 200px;
+        max-height: 300px;
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    .btn-terminal {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+}
