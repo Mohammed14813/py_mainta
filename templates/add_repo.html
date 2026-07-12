@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📂 إضافة مستودع - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 15px 0;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8ebff;
+        }
+        .file-list {
+            margin: 10px 0;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+        .file-item .name {
+            font-weight: 500;
+        }
+        .file-item .size {
+            color: #888;
+            font-size: 13px;
+        }
+        .manual-file {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-right: 3px solid #667eea;
+        }
+        .manual-file input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin: 5px 0;
+        }
+        .manual-file textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .btn-add-manual {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-add-manual:hover {
+            background: #5a6fd6;
+        }
+        .btn-remove-file {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-remove-file:hover {
+            background: #cc0000;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .form-group input[type="file"] {
+            display: none;
+        }
+        .btn-submit {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+        }
+        .method-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .method-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .method-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .method-tab:hover {
+            background: #ddd;
+        }
+        .method-tab.active:hover {
+            background: #5a6fd6;
+        }
+        .method-content {
+            display: none;
+        }
+        .method-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo" class="active">➕ إضافة مستودع</a>
+                <a href="/repositories">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>📂 إضافة مستودع جديد</h2>
+            <p style="color:#888; margin-bottom:20px;">أنشئ مستودعاً جديداً لملفات البوت الخاص بك</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="/add_repo" method="POST" enctype="multipart/form-data" id="repoForm">
+                <div class="form-group">
+                    <label>📝 اسم المستودع:</label>
+                    <input type="text" name="repo_name" placeholder="مثال: my_telegram_bot" required>
+                </div>
+
+                <!-- طريقتين لإضافة الملفات -->
+                <div class="method-tabs">
+                    <button type="button" class="method-tab active" onclick="switchMethod('upload')">
+                        📤 رفع من الجهاز
+                    </button>
+                    <button type="button" class="method-tab" onclick="switchMethod('manual')">
+                        ✏️ كتابة يدوية
+                    </button>
+                </div>
+
+                <!-- الطريقة 1: رفع ملفات -->
+                <div id="methodUpload" class="method-content active">
+                    <div class="upload-area" id="dropZone">
+                        <p style="font-size:24px;">📤</p>
+                        <p style="font-weight:bold;">اسحب الملفات هنا أو اضغط للاختيار</p>
+                        <p style="color:#888; font-size:13px;">يمكنك اختيار عدة ملفات دفعة واحدة</p>
+                        <input type="file" name="files" multiple id="fileInput" accept=".py,.txt,.json,.env,.yml,.yaml,.md">
+                    </div>
+                    <div id="fileList" class="file-list"></div>
+                </div>
+
+                <!-- الطريقة 2: كتابة يدوية -->
+                <div id="methodManual" class="method-content">
+                    <div id="manualFiles">
+                        <div class="manual-file">
+                            <input type="text" name="manual_files[]" placeholder="اسم الملف (مثال: bot.py)">
+                            <textarea name="manual_contents[]" placeholder="اكتب محتوى الملف هنا..."></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-manual" onclick="addManualFile()">
+                        ➕ إضافة ملف آخر
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-submit">💾 حفظ المستودع</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- زر الدعم الثابت -->
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20إضافة%20مستودع" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+
+    <script>
+        // ========== تبديل طريقة الرفع ==========
+        function switchMethod(method) {
+            const tabs = document.querySelectorAll('.method-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (method === 'upload') {
+                document.getElementById('methodUpload').classList.add('active');
+                document.getElementById('methodManual').classList.remove('active');
+                tabs[0].classList.add('active');
+            } else {
+                document.getElementById('methodManual').classList.add('active');
+                document.getElementById('methodUpload').classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        }
+
+        // ========== إضافة ملف يدوي ==========
+        function addManualFile() {
+            const container = document.getElementById('manualFiles');
+            const div = document.createElement('div');
+            div.className = 'manual-file';
+            div.innerHTML = `
+                <input type="text" name="manual_files[]" placeholder="اسم الملف (مثال: bot.py)">
+                <textarea name="manual_contents[]" placeholder="اكتب محتوى الملف هنا..."></textarea>
+                <button type="button" class="btn-remove-file" onclick="this.parentElement.remove()">🗑 حذف</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // ========== رفع الملفات بالسحب والإفلات ==========
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            fileInput.files = e.dataTransfer.files;
+            updateFileList();
+        });
+
+        fileInput.addEventListener('change', updateFileList);
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+            const files = fileInput.files;
+            for (let file of files) {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `
+                    <span class="name">📄 ${file.name}</span>
+                    <span class="size">${(file.size / 1024).toFixed(1)} KB</span>
+                `;
+                fileList.appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>
