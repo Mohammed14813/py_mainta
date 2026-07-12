@@ -57,17 +57,33 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 30px rgba(66, 133, 244, 0.6);
         }
-        .login-btn img {
-            vertical-align: middle;
-            margin-left: 10px;
+        .admin-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            color: #555;
+            font-size: 14px;
         }
-        .info {
-            margin-top: 20px;
+        .admin-info .label {
             color: #888;
             font-size: 13px;
         }
-        .info strong {
-            color: #333;
+        .admin-info .phone {
+            font-size: 20px;
+            font-weight: bold;
+            color: #25D366;
+            display: block;
+            margin-top: 5px;
+            text-decoration: none;
+        }
+        .admin-info .phone:hover {
+            text-decoration: underline;
+        }
+        .admin-info .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
         }
         .flash-messages {
             margin-bottom: 20px;
@@ -94,6 +110,11 @@
             background: #d1ecf1;
             color: #0c5460;
         }
+        .whatsapp-icon {
+            font-size: 18px;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -115,9 +136,13 @@
             🔑 تسجيل الدخول بحساب Google
         </a>
 
-        <div class="info">
-            <p>⚠️ مسموح فقط للمدير: <strong>vgty65v@gmail.com</strong></p>
-            <p style="margin-top:5px; font-size:12px;">🔐 مدعوم من Google OAuth 2.0</p>
+        <div class="admin-info">
+            <div class="label">👑 للتواصل مع المدير:</div>
+            <a href="https://wa.me/967779308631" target="_blank" class="phone">
+                <span class="whatsapp-icon">💬</span>
+                967 779 308 631
+            </a>
+            <div class="hint">📱 واتساب - اضغط للتواصل المباشر</div>
         </div>
     </div>
 </body>
