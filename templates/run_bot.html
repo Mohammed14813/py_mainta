@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>▶ تشغيل بوت - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .form-group select,
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+        .form-group select:focus,
+        .form-group input[type="text"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        .form-group .hint {
+            color: #888;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        .btn-run {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn-run:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+        }
+        .btn-run:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .empty-repos {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .empty-repos .icon {
+            font-size: 50px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories">📂 مستودعاتي</a>
+                <a href="/run_bot" class="active">▶ تشغيل بوت</a>
+                <a href="/my_bots">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>▶ تشغيل بوت</h2>
+            <p style="color:#888; margin-bottom:20px;">اختر مستودعاً وحدد ملفات التشغيل لبدء البوت</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if repos %}
+                <div class="form-container">
+                    <form action="/run_bot" method="POST">
+                        <div class="form-group">
+                            <label>📂 اختيار المستودع:</label>
+                            <select name="repo_id" required>
+                                <option value="">-- اختر مستودعاً --</option>
+                                {% for repo in repos %}
+                                <option value="{{ repo[0] }}">{{ repo[1] }} ({{ repo[2][:10] if repo[2] else '' }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>🎯 اسم ملف التشغيل الرئيسي:</label>
+                            <input type="text" name="main_file" placeholder="مثال: bot.py" required>
+                            <div class="hint">أدخل اسم الملف الذي سيتم تشغيله (مثل: bot.py أو main.py)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>📦 اسم ملف المتطلبات (اختياري):</label>
+                            <input type="text" name="requirements_file" placeholder="مثال: requirements.txt">
+                            <div class="hint">اتركه فارغاً إن لم يكن لديك ملف متطلبات</div>
+                        </div>
+
+                        <button type="submit" class="btn-run">🚀 بدء التشغيل</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="empty-repos">
+                    <span class="icon">📭</span>
+                    <h3>لا توجد مستودعات</h3>
+                    <p>يجب إنشاء مستودع أولاً قبل تشغيل بوت</p>
+                    <a href="/add_repo" style="display:inline-block; margin-top:15px; padding:10px 30px; background:#667eea; color:white; border-radius:25px; text-decoration:none;">➕ إضافة مستودع</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20تشغيل%20البوت" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+</body>
+</html>
