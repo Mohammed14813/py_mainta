@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖥️ المحطة - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='terminal.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots" class="active">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="terminal-header-bar">
+                <h3>🖥️ محطة التحكم: {{ bot[2] }}</h3>
+                <div class="terminal-status">
+                    <span class="status-badge {{ bot[5] }}" id="statusBadge">
+                        {% if bot[5] == 'running' %}🟢 يعمل
+                        {% elif bot[5] == 'error' %}🔴 خطأ
+                        {% else %}⚪ متوقف{% endif %}
+                    </span>
+                    <span style="color:#888; font-size:13px;">PID: {{ bot[6] or '—' }}</span>
+                </div>
+            </div>
+
+            <div class="terminal-wrapper">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">🖥️  {{ bot[2] }} - {{ bot[3] }}</span>
+                </div>
+                <div class="terminal-display" id="terminalOutput">
+                    <div class="terminal-line">
+                        <span class="prompt">$</span>
+                        <span class="command"> python {{ bot[3] }}</span>
+                    </div>
+                    <div id="terminalContent">
+                        <div class="terminal-line">
+                            <span class="info">═══════════════════════════════════════</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="info">🚀 جاري تحضير بيئة التشغيل...</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="info">📂 المستودع: {{ repo[1] if repo else 'غير معروف' }}</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="info">═══════════════════════════════════════</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="warning">⏳ في انتظار بدء التشغيل...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terminal-controls">
+                    <button class="btn-terminal start" onclick="startBot()" id="btnStart">
+                        ▶ تشغيل
+                    </button>
+                    <button class="btn-terminal stop" onclick="stopBot()" id="btnStop">
+                        ⏹ إيقاف
+                    </button>
+                    <button class="btn-terminal restart" onclick="restartBot()" id="btnRestart">
+                        🔄 إعادة تشغيل
+                    </button>
+                    <a href="/my_bots" class="btn-terminal back" style="text-decoration:none; display:inline-flex; align-items:center;">
+                        ↩ العودة
+                    </a>
+                </div>
+            </div>
+
+            <div class="terminal-info">
+                <p style="color:#888; font-size:13px; margin-top:10px;">
+                    💡 يمكنك تشغيل وإيقاف البوت من هنا. سترى جميع الأوامر والمخرجات في المحطة أعلاه.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر الدعم الثابت -->
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20بوت%20{{ bot[2] }}" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script>
+        // ========== متغيرات الاتصال ==========
+        const socket = io();
+        const botId = {{ bot[0] }};
+        let isConnected = false;
+
+        // ========== الاتصال ==========
+        socket.on('connect', function() {
+            isConnected = true;
+            addTerminalLine('🟢 متصل بالمحطة', 'success');
+            addTerminalLine('📌 جاهز لتشغيل البوت', 'info');
+        });
+
+        socket.on('disconnect', function() {
+            isConnected = false;
+            addTerminalLine('🔴 تم قطع الاتصال', 'error');
+        });
+
+        // ========== استقبال مخرجات المحطة ==========
+        socket.on('terminal_output', function(data) {
+            addTerminalLine(data.message, data.type);
+
+            // تحديث الحالة بناءً على الرسالة
+            if (data.type === 'success' && data.message.includes('يعمل')) {
+                updateStatus('running', '🟢 يعمل');
+            } else if (data.type === 'error' && data.message.includes('فشل')) {
+                updateStatus('error', '🔴 خطأ');
+            }
+        });
+
+        // ========== إضافة سطر إلى المحطة ==========
+        function addTerminalLine(text, type = 'output') {
+            const container = document.getElementById('terminalContent');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+
+            if (type === 'command') {
+                line.innerHTML = `<span class="prompt">$</span> <span class="command">${text}</span>`;
+            } else if (type === 'success') {
+                line.innerHTML = `<span class="success">✅ ${text}</span>`;
+            } else if (type === 'error') {
+                line.innerHTML = `<span class="error">❌ ${text}</span>`;
+            } else if (type === 'warning') {
+                line.innerHTML = `<span class="warning">⚠️ ${text}</span>`;
+            } else if (type === 'info') {
+                line.innerHTML = `<span class="info">ℹ️ ${text}</span>`;
+            } else {
+                line.innerHTML = `<span class="output">${text}</span>`;
+            }
+
+            container.appendChild(line);
+            const display = document.getElementById('terminalOutput');
+            display.scrollTop = display.scrollHeight;
+        }
+
+        // ========== تحديث الحالة ==========
+        function updateStatus(status, label) {
+            const badge = document.getElementById('statusBadge');
+            badge.className = `status-badge ${status}`;
+            badge.textContent = label;
+        }
+
+        // ========== تشغيل البوت ==========
+        function startBot() {
+            if (!isConnected) {
+                addTerminalLine('❌ غير متصل بالمحطة', 'error');
+                return;
+            }
+            addTerminalLine('▶ جاري تشغيل البوت...', 'command');
+            socket.emit('start_bot_terminal', { bot_id: botId });
+            
+            document.getElementById('btnStart').disabled = true;
+            document.getElementById('btnStart').textContent = '⏳ جاري...';
+        }
+
+        // ========== إيقاف البوت ==========
+        function stopBot() {
+            if (!isConnected) {
+                addTerminalLine('❌ غير متصل بالمحطة', 'error');
+                return;
+            }
+            addTerminalLine('⏹ جاري إيقاف البوت...', 'command');
+            socket.emit('stop_bot_terminal', { bot_id: botId });
+        }
+
+        // ========== إعادة تشغيل البوت ==========
+        function restartBot() {
+            if (!isConnected) {
+                addTerminalLine('❌ غير متصل بالمحطة', 'error');
+                return;
+            }
+            addTerminalLine('🔄 جاري إعادة تشغيل البوت...', 'command');
+            
+            // إيقاف ثم تشغيل
+            socket.emit('stop_bot_terminal', { bot_id: botId });
+            setTimeout(() => {
+                socket.emit('start_bot_terminal', { bot_id: botId });
+            }, 1000);
+        }
+
+        // ========== تفعيل الأزرار بعد التشغيل ==========
+        // مراقبة حالة البوت من الخادم
+        setInterval(function() {
+            fetch('/my_bots')
+                .then(response => response.text())
+                .then(html => {
+                    // استخراج حالة البوت من الصفحة
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const statusElement = doc.querySelector(`.status-badge`);
+                    if (statusElement) {
+                        const statusText = statusElement.textContent;
+                        if (statusText.includes('يعمل')) {
+                            document.getElementById('btnStart').disabled = true;
+                            document.getElementById('btnStart').textContent = '▶ يعمل';
+                            updateStatus('running', '🟢 يعمل');
+                        } else if (statusText.includes('خطأ')) {
+                            document.getElementById('btnStart').disabled = false;
+                            document.getElementById('btnStart').textContent = '▶ تشغيل';
+                            updateStatus('error', '🔴 خطأ');
+                        } else {
+                            document.getElementById('btnStart').disabled = false;
+                            document.getElementById('btnStart').textContent = '▶ تشغيل';
+                            updateStatus('stopped', '⚪ متوقف');
+                        }
+                    }
+                })
+                .catch(() => {});
+        }, 5000);
+    </script>
+</body>
+</html>
