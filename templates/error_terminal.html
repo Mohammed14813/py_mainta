@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❌ خطأ في التشغيل - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .error-container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #ff4444;
+        }
+        .error-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .error-header .icon {
+            font-size: 40px;
+        }
+        .error-header h3 {
+            color: #ff4444;
+            margin: 0;
+        }
+        .error-body {
+            background: #0c0c0c;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #ff4444;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .error-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .error-body::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        .error-body::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+        .error-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .btn-error {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .btn-error:hover {
+            transform: translateY(-2px);
+        }
+        .btn-error.fix {
+            background: #ff6f00;
+            color: white;
+        }
+        .btn-error.fix:hover {
+            background: #e65100;
+        }
+        .btn-error.back {
+            background: #666;
+            color: white;
+        }
+        .btn-error.back:hover {
+            background: #555;
+        }
+        .btn-error.delete {
+            background: #ff1744;
+            color: white;
+        }
+        .btn-error.delete:hover {
+            background: #d50000;
+        }
+        .error-tips {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #333;
+        }
+        .error-tips h4 {
+            color: #ffaa00;
+            margin: 0 0 10px 0;
+        }
+        .error-tips ul {
+            color: #aaa;
+            margin: 0;
+            padding-right: 20px;
+        }
+        .error-tips ul li {
+            margin: 5px 0;
+        }
+        .error-tips ul li code {
+            background: #2d2d2d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #00ff00;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots" class="active">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>❌ فشل تشغيل البوت</h2>
+            <p style="color:#888; margin-bottom:20px;">حدث خطأ أثناء محاولة تشغيل البوت. تفاصيل الخطأ أدناه:</p>
+
+            <div class="error-container">
+                <div class="error-header">
+                    <span class="icon">❌</span>
+                    <div>
+                        <h3>خطأ في التشغيل</h3>
+                        <p style="color:#888; margin:0; font-size:13px;">البوت: {{ bot_name or 'غير معروف' }}</p>
+                    </div>
+                </div>
+
+                <div class="error-body">
+                    {{ error or 'خطأ غير معروف' }}
+                </div>
+
+                <div class="error-tips">
+                    <h4>💡 نصائح للحل:</h4>
+                    <ul>
+                        <li>تأكد من وجود جميع المكتبات المطلوبة في <code>requirements.txt</code></li>
+                        <li>تأكد من صحة التوكن في ملف البوت</li>
+                        <li>تأكد من صحة اسم ملف التشغيل <code>{{ main_file }}</code></li>
+                        {% if requirements_file %}
+                        <li>تأكد من صحة ملف المتطلبات <code>{{ requirements_file }}</code></li>
+                        {% endif %}
+                        <li>تأكد من عدم وجود أخطاء نحوية في الكود</li>
+                    </ul>
+                </div>
+
+                <div class="error-actions">
+                    <a href="/repo/{{ repo_id }}" class="btn-error fix">📝 تعديل المستودع</a>
+                    <a href="/restart_bot/{{ bot_id }}" class="btn-error fix">🔄 إعادة المحاولة</a>
+                    <a href="/my_bots" class="btn-error back">↩ العودة للبوتات</a>
+                    <a href="/delete_bot/{{ bot_id }}" class="btn-error delete" onclick="return confirm('هل أنت متأكد من حذف هذا البوت؟')">🗑 حذف البوت</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20تشغيل%20البوت" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+</body>
+</html>
