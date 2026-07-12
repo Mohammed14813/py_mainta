@@ -1,0 +1,22 @@
+# render.yaml
+services:
+  - type: web
+    name: py-mainta
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+    startCommand: |
+      python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: SECRET_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        value: vgty65v@gmail.com
+    plan: free
+    region: frankfurt
