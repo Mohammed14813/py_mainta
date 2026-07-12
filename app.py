@@ -21,7 +21,7 @@ app.config.from_object(Config)
 Session(app)
 
 # تهيئة SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # تهيئة OAuth
 init_oauth(app)
