@@ -20,10 +20,10 @@ app.config.from_object(Config)
 # تهيئة الجلسة
 Session(app)
 
-# تهيئة SocketIO
+# ===================== تهيئة SocketIO =====================
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# تهيئة OAuth
+# ===================== تهيئة OAuth =====================
 init_oauth(app)
 
 # ===================== تهيئة المديرين =====================
@@ -145,6 +145,17 @@ def repo_files(repo_id):
     files = db.get_repo_files(repo_id)
     return render_template('repo_files.html', repo=repo, files=files)
 
+@app.route('/delete_repo/<int:repo_id>')
+@login_required
+@admin_required
+def delete_repo(repo_id):
+    # حذف المستودع من قاعدة البيانات
+    db.delete_repository(repo_id)
+    # حذف من القرص
+    repo_manager.delete_repo_from_disk(repo_id)
+    flash('✅ تم حذف المستودع', 'success')
+    return redirect('/repositories')
+
 # ===================== تعديل الملف =====================
 @app.route('/edit_file/<int:repo_id>/<filename>', methods=['GET', 'POST'])
 @login_required
@@ -221,9 +232,11 @@ def run_bot():
             flash(f'❌ {message}', 'error')
             return render_template('error_terminal.html',
                                  bot_id=bot_id,
+                                 bot_name=repo[1],
                                  error=message,
                                  main_file=main_file,
-                                 requirements_file=requirements_file)
+                                 requirements_file=requirements_file,
+                                 repo_id=repo_id)
 
     repos = db.get_all_repositories()
     return render_template('run_bot.html', repos=repos)
@@ -324,4 +337,4 @@ def handle_disconnect():
 
 # ===================== تشغيل التطبيق =====================
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
