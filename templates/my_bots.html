@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 بوتاتي - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .bot-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #eee;
+            transition: 0.3s;
+        }
+        .bot-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+        .bot-card .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .bot-card .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .bot-card .status {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .status.running {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.stopped {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .bot-card .details {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .bot-card .details span {
+            display: block;
+            margin: 3px 0;
+        }
+        .bot-card .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .bot-card .actions a {
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .bot-card .actions .stop {
+            background: #ff4444;
+            color: white;
+        }
+        .bot-card .actions .stop:hover {
+            background: #cc0000;
+        }
+        .bot-card .actions .start {
+            background: #4CAF50;
+            color: white;
+        }
+        .bot-card .actions .start:hover {
+            background: #45a049;
+        }
+        .bot-card .actions .restart {
+            background: #ffaa00;
+            color: white;
+        }
+        .bot-card .actions .restart:hover {
+            background: #e69900;
+        }
+        .bot-card .actions .delete {
+            background: #ff1744;
+            color: white;
+        }
+        .bot-card .actions .delete:hover {
+            background: #d50000;
+        }
+        .bot-card .actions .terminal {
+            background: #667eea;
+            color: white;
+        }
+        .bot-card .actions .terminal:hover {
+            background: #5a6fd6;
+        }
+        .bot-card .actions .fix {
+            background: #ff6f00;
+            color: white;
+        }
+        .bot-card .actions .fix:hover {
+            background: #e65100;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        .empty-state .icon {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .repo-name {
+            color: #667eea;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots" class="active">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>🤖 بوتاتي</h2>
+            <p style="color:#888; margin-bottom:20px;">جميع البوتات التي قمت بتشغيلها</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if bots %}
+                <div class="bot-grid">
+                    {% for bot in bots %}
+                    <div class="bot-card">
+                        <div class="header">
+                            <div class="name">🤖 {{ bot[2] }}</div>
+                            <div class="status {{ bot[5] }}">
+                                {% if bot[5] == 'running' %}🟢 يعمل
+                                {% elif bot[5] == 'error' %}🔴 خطأ
+                                {% else %}⚪ متوقف{% endif %}
+                            </div>
+                        </div>
+                        <div class="details">
+                            <span>📂 المستودع: <span class="repo-name">{{ bot[1] }}</span></span>
+                            <span>📄 ملف التشغيل: <strong>{{ bot[3] }}</strong></span>
+                            {% if bot[4] %}
+                            <span>📦 ملف المتطلبات: {{ bot[4] }}</span>
+                            {% endif %}
+                            {% if bot[6] %}
+                            <span>🆔 PID: {{ bot[6] }}</span>
+                            {% endif %}
+                            <span>📅 تاريخ التشغيل: {{ bot[7][:16] if bot[7] else 'غير معروف' }}</span>
+                        </div>
+                        <div class="actions">
+                            {% if bot[5] == 'running' %}
+                                <a href="/stop_bot/{{ bot[0] }}" class="stop">⏸ إيقاف</a>
+                                <a href="/restart_bot/{{ bot[0] }}" class="restart">🔄 إعادة تشغيل</a>
+                            {% elif bot[5] == 'error' %}
+                                <a href="/restart_bot/{{ bot[0] }}" class="restart">🔄 إعادة تشغيل</a>
+                                <a href="/repo/{{ bot[1] }}" class="fix">📝 إصلاح المستودع</a>
+                            {% else %}
+                                <a href="/restart_bot/{{ bot[0] }}" class="start">▶ تشغيل</a>
+                            {% endif %}
+                            <a href="/terminal/{{ bot[0] }}" class="terminal">🖥️ المحطة</a>
+                            <a href="/delete_bot/{{ bot[0] }}" class="delete" onclick="return confirm('هل أنت متأكد من حذف هذا البوت؟')">🗑 حذف</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">🤖</span>
+                    <h3>لا توجد بوتات</h3>
+                    <p>قم بتشغيل بوت جديد من خلال "تشغيل بوت"</p>
+                    <a href="/run_bot" style="display:inline-block; margin-top:15px; padding:10px 30px; background:#667eea; color:white; border-radius:25px; text-decoration:none;">▶ تشغيل بوت</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20البوتات" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+</body>
+</html>
