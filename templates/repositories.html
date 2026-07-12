@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📂 مستودعاتي - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .repo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .repo-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #eee;
+            transition: 0.3s;
+        }
+        .repo-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+        .repo-card .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .repo-card .details {
+            color: #888;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+        .repo-card .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .repo-card .actions a {
+            padding: 6px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .repo-card .actions .view {
+            background: #667eea;
+            color: white;
+        }
+        .repo-card .actions .view:hover {
+            background: #5a6fd6;
+        }
+        .repo-card .actions .delete {
+            background: #ff4444;
+            color: white;
+        }
+        .repo-card .actions .delete:hover {
+            background: #cc0000;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        .empty-state .icon {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories" class="active">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2>📂 مستودعاتي</h2>
+            <p style="color:#888; margin-bottom:20px;">جميع المستودعات التي قمت بإنشائها</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if repos %}
+                <div class="repo-grid">
+                    {% for repo in repos %}
+                    <div class="repo-card">
+                        <div class="name">📁 {{ repo[1] }}</div>
+                        <div class="details">
+                            🆔 #{{ repo[0] }}<br>
+                            📅 {{ repo[2][:16] if repo[2] else 'غير معروف' }}
+                        </div>
+                        <div class="actions">
+                            <a href="/repo/{{ repo[0] }}" class="view">📂 عرض الملفات</a>
+                            <a href="/delete_repo/{{ repo[0] }}" class="delete" onclick="return confirm('هل أنت متأكد من حذف هذا المستودع؟')">🗑 حذف</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">📭</span>
+                    <h3>لا توجد مستودعات</h3>
+                    <p>قم بإضافة مستودع جديد بالضغط على "إضافة مستودع"</p>
+                    <a href="/add_repo" style="display:inline-block; margin-top:15px; padding:10px 30px; background:#667eea; color:white; border-radius:25px; text-decoration:none;">➕ إضافة مستودع</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20المستودعات" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+</body>
+</html>
