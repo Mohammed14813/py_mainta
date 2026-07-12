@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 تسجيل الدخول - Py_Mainta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background: rgba(255,255,255,0.95);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .logo span {
+            color: #667eea;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .login-btn {
+            display: inline-block;
+            background: #4285f4;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
+        }
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(66, 133, 244, 0.6);
+        }
+        .login-btn img {
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        .info {
+            margin-top: 20px;
+            color: #888;
+            font-size: 13px;
+        }
+        .info strong {
+            color: #333;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .flash.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .flash.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .flash.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .flash.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">Py<span>Mainta</span></div>
+        <div class="subtitle">🚀 استضافة بوتات تيليجرام بلغة بايثون</div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <a href="/google_login" class="login-btn">
+            🔑 تسجيل الدخول بحساب Google
+        </a>
+
+        <div class="info">
+            <p>⚠️ مسموح فقط للمدير: <strong>vgty65v@gmail.com</strong></p>
+            <p style="margin-top:5px; font-size:12px;">🔐 مدعوم من Google OAuth 2.0</p>
+        </div>
+    </div>
+</body>
+</html>
