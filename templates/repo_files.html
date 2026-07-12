@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📂 ملفات المستودع - Py_Mainta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .file-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #eee;
+            transition: 0.3s;
+        }
+        .file-card:hover {
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+        .file-card .filename {
+            font-weight: bold;
+            color: #333;
+            font-size: 15px;
+        }
+        .file-card .size {
+            color: #888;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .file-card .actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .file-card .actions a {
+            padding: 4px 12px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .file-card .actions .edit {
+            background: #ffaa00;
+            color: white;
+        }
+        .file-card .actions .edit:hover {
+            background: #e69900;
+        }
+        .file-card .actions .delete {
+            background: #ff4444;
+            color: white;
+        }
+        .file-card .actions .delete:hover {
+            background: #cc0000;
+        }
+        .repo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .repo-header h2 {
+            margin: 0;
+        }
+        .btn-back {
+            background: #666;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .btn-back:hover {
+            background: #555;
+        }
+        .empty-files {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .empty-files .icon {
+            font-size: 50px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Py<span>Mainta</span></div>
+            <div class="nav-links">
+                <a href="/add_repo">➕ إضافة مستودع</a>
+                <a href="/repositories" class="active">📂 مستودعاتي</a>
+                <a href="/run_bot">▶ تشغيل بوت</a>
+                <a href="/my_bots">🤖 بوتاتي</a>
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/logout">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="repo-header">
+                <h2>📂 {{ repo[1] }}</h2>
+                <a href="/repositories" class="btn-back">↩ العودة للمستودعات</a>
+            </div>
+
+            <p style="color:#888; margin-bottom:15px;">
+                🆔 #{{ repo[0] }} | 📅 {{ repo[2][:16] if repo[2] else 'غير معروف' }}
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if files %}
+                <div class="file-grid">
+                    {% for file in files %}
+                    <div class="file-card">
+                        <div class="filename">📄 {{ file[2] }}</div>
+                        <div class="size">📏 {{ file[3]|length }} حرف</div>
+                        <div class="actions">
+                            <a href="/edit_file/{{ repo[0] }}/{{ file[2] }}" class="edit">✏️ تعديل</a>
+                            <a href="/delete_file/{{ repo[0] }}/{{ file[2] }}" class="delete" onclick="return confirm('هل أنت متأكد من حذف هذا الملف؟')">🗑 حذف</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-files">
+                    <span class="icon">📭</span>
+                    <p>لا توجد ملفات في هذا المستودع</p>
+                    <p style="font-size:13px;">قم بإضافة ملفات من خلال زر "إضافة مستودع"</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="support-button">
+        <a href="mailto:vgty65v@gmail.com?subject=مشكلة%20في%20المستودع%20{{ repo[1] }}" target="_blank">
+            💬 تواصل مع الدعم
+        </a>
+    </div>
+</body>
+</html>
